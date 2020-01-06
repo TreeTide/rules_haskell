@@ -276,13 +276,20 @@ def link_libraries(libs, args, prefix_optl = False):
         libfmt = "-l%s"
         dirfmt = "-L%s"
 
+    # Needs to be prefixed by -optl, otherwise GHC would not forward the flag
+    # to the linker during compilation, causing compilation of template Haskell
+    # depending on C libraries to fail.
+    rpathfmt = "-optl-Wl,-rpath,%s"
+
     if hasattr(args, "add_all"):
         args.add_all(cc_libs, map_each = get_lib_name, format_each = libfmt)
         args.add_all(cc_libs, map_each = get_dirname, format_each = dirfmt, uniquify = True)
+        args.add_all(cc_libs, map_each = get_dirname, format_each = rpathfmt, uniquify = True)
     else:
         cc_libs_list = cc_libs.to_list()
         args.extend([libfmt % get_lib_name(lib) for lib in cc_libs_list])
         args.extend([dirfmt % lib.dirname for lib in cc_libs_list])
+        args.extend([rpathfmt % lib.dirname for lib in cc_libs_list])
 
 # tests in /tests/unit_tests/BUILD
 def parent_dir_path(path):
