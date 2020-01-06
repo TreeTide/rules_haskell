@@ -70,13 +70,14 @@ def build_haskell_repl(
             lib_imports.append(idir)
 
     # Link C library dependencies
-    ghci_extra_libs = get_ghci_extra_libs(
+    (ghci_extra_libs, extra_flags) = get_ghci_extra_libs(
         hs,
         posix,
         cc_info,
         path_prefix = "$RULES_HASKELL_EXEC_ROOT",
     )
     link_libraries(ghci_extra_libs, args)
+    args.extend(extra_flags)
 
     # NOTE: We can avoid constructing this in the future by instead generating
     #   a dedicated package configuration file defining the required libraries.

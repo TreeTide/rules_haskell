@@ -55,13 +55,14 @@ def build_haskell_runghc(
         for idir in set.to_list(hs_info.import_dirs):
             args += ["-i{0}".format(idir)]
 
-    ghci_extra_libs = get_ghci_extra_libs(
+    (ghci_extra_libs, extra_args) = get_ghci_extra_libs(
         hs,
         posix,
         cc_info,
         path_prefix = "$RULES_HASKELL_EXEC_ROOT",
     )
     link_libraries(ghci_extra_libs, args)
+    args.extend(extra_args)
 
     runghc_file = hs.actions.declare_file(target_unique_name(hs, "runghc"))
 

@@ -21,7 +21,7 @@ def _get_extra_libraries(hs, posix, with_shared, cc_info):
     # NOTE This is duplicated from path_utils.bzl link_libraries. This whole
     # function can go away once we track libraries outside of package
     # configuration files.
-    (static_libs, dynamic_libs) = get_extra_libs(
+    (static_libs, dynamic_libs, _) = get_extra_libs(
         hs,
         posix,
         cc_info,
