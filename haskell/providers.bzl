@@ -11,7 +11,6 @@ load(
     "create_rpath_entry",
     "get_lib_name",
     "is_hs_library",
-    "make_library_path",
     "mangle_static_library",
     "rel_to_pkgroot",
     "target_unique_name",
@@ -206,9 +205,7 @@ def get_ghci_extra_libs(hs, posix, cc_info, path_prefix = None):
       path_prefix: (optional) Prefix for the entries in the generated library path.
 
     Returns:
-      (libs, ghc_env):
-        libs: depset of File, the libraries that should be passed to GHCi.
-        ghc_env: dict, environment variables to set for GHCi.
+      libs: depset of File, the libraries that should be passed to GHCi.
 
     """
     (static_libs, dynamic_libs) = get_extra_libs(
@@ -221,15 +218,7 @@ def get_ghci_extra_libs(hs, posix, cc_info, path_prefix = None):
     )
     libs = depset(transitive = [static_libs, dynamic_libs])
 
-    # NOTE: We can avoid constructing these in the future by instead generating
-    #   a dedicated package configuration file defining the required libraries.
-    library_path = make_library_path(hs, libs, prefix = path_prefix)
-    ghc_env = {
-        "LIBRARY_PATH": library_path,
-        "LD_LIBRARY_PATH": library_path,
-    }
-
-    return (libs, ghc_env)
+    return libs
 
 def get_extra_libs(hs, posix, cc_info, dynamic = False, pic = None, fixup_dir = "_libs"):
     """Get libraries appropriate for linking with GHC.

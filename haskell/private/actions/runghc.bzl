@@ -1,6 +1,5 @@
 """runghc support"""
 
-load(":private/context.bzl", "render_env")
 load(":private/packages.bzl", "expose_packages", "pkg_info_to_compile_flags")
 load(
     ":private/path_utils.bzl",
@@ -56,7 +55,7 @@ def build_haskell_runghc(
         for idir in set.to_list(hs_info.import_dirs):
             args += ["-i{0}".format(idir)]
 
-    (ghci_extra_libs, ghc_env) = get_ghci_extra_libs(
+    ghci_extra_libs = get_ghci_extra_libs(
         hs,
         posix,
         cc_info,
@@ -87,7 +86,7 @@ def build_haskell_runghc(
         template = runghc_wrapper,
         output = runghc_file,
         substitutions = {
-            "{ENV}": render_env(ghc_env),
+            "{ENV}": "",
             "{TOOL}": hs.tools.runghc.path,
             "{CC}": hs.toolchain.cc_wrapper.executable.path,
             "{ARGS}": " ".join([shell.quote(a) for a in runcompile_flags]),

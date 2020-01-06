@@ -1,6 +1,5 @@
 """GHCi REPL support"""
 
-load(":private/context.bzl", "render_env")
 load(":private/packages.bzl", "expose_packages", "pkg_info_to_compile_flags")
 load(
     ":private/path_utils.bzl",
@@ -71,7 +70,7 @@ def build_haskell_repl(
             lib_imports.append(idir)
 
     # Link C library dependencies
-    (ghci_extra_libs, ghc_env) = get_ghci_extra_libs(
+    ghci_extra_libs = get_ghci_extra_libs(
         hs,
         posix,
         cc_info,
@@ -118,7 +117,6 @@ def build_haskell_repl(
         template = ghci_repl_wrapper,
         output = repl_file,
         substitutions = {
-            "{ENV}": render_env(ghc_env),
             "{TOOL}": hs.tools.ghci.path,
             "{CC}": hs.toolchain.cc_wrapper.executable.path,
             "{ARGS}": " ".join(
