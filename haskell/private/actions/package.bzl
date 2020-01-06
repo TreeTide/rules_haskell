@@ -47,17 +47,20 @@ def _get_extra_libraries(hs, posix, with_shared, cc_info):
     ])
     cc_libs = cc_static_libs.to_list() + cc_dynamic_libs.to_list()
 
-    lib_dirs = depset(direct = [
-        lib.dirname
-        for lib in cc_libs
-    ])
+    lib_dirs = {
+        lib.dirname: []
+        for lib_to_link in cc_info.linking_context.libraries_to_link.to_list()
+        for attr in ["dynamic_library", "pic_static_library", "static_library"]
+        for lib in [getattr(lib_to_link, attr)]
+        if lib and not is_hs_library(get_lib_name(lib))
+    }.keys()
 
     lib_names = [
         get_lib_name(lib)
         for lib in cc_libs
     ]
 
-    return (lib_dirs.to_list(), lib_names)
+    return (lib_dirs, lib_names)
 
 def package(
         hs,
