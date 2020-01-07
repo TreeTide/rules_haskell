@@ -233,14 +233,13 @@ def _create_repl(hs, posix, ctx, repl_info, output):
         repl_info.load_info.cc_info,
         repl_info.dep_info.cc_info,
     ])
-    (ghci_extra_libs, extra_args) = get_ghci_extra_libs(
+    ghci_extra_libs = get_ghci_extra_libs(
         hs,
         posix,
         cc_info,
         path_prefix = "$RULES_HASKELL_EXEC_ROOT",
     )
     link_libraries(ghci_extra_libs, args)
-    args.extend(extra_args)
 
     # Add import directories
     for import_dir in repl_info.load_info.import_dirs.to_list():

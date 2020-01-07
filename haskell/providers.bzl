@@ -208,7 +208,7 @@ def get_ghci_extra_libs(hs, posix, cc_info, path_prefix = None):
       libs: depset of File, the libraries that should be passed to GHCi.
 
     """
-    (static_libs, dynamic_libs, extra_flags) = get_extra_libs(
+    (static_libs, dynamic_libs) = get_extra_libs(
         hs,
         posix,
         cc_info,
@@ -218,7 +218,7 @@ def get_ghci_extra_libs(hs, posix, cc_info, path_prefix = None):
     )
     libs = depset(transitive = [static_libs, dynamic_libs])
 
-    return (libs, extra_flags)
+    return libs
 
 def get_extra_libs(hs, posix, cc_info, dynamic = False, pic = None, fixup_dir = "_libs"):
     """Get libraries appropriate for linking with GHC.
@@ -243,7 +243,6 @@ def get_extra_libs(hs, posix, cc_info, dynamic = False, pic = None, fixup_dir = 
 
     """
     fixed_lib_dir = target_unique_name(hs, fixup_dir)
-    extra_flags = []
     libs_to_link = _get_unique_lib_files(cc_info)
     static_libs = []
     dynamic_libs = []
@@ -265,8 +264,6 @@ def get_extra_libs(hs, posix, cc_info, dynamic = False, pic = None, fixup_dir = 
             static_lib = lib_to_link.static_library
 
         static_lib = mangle_static_library(hs, posix, dynamic_lib, static_lib, fixed_lib_dir)
-        if static_lib and static_lib.owner == hs.label:
-            extra_flags = ["-optl-Wl,-B" + static_lib.dirname]
 
         if static_lib and not (dynamic and dynamic_lib):
             static_libs.append(static_lib)
@@ -279,7 +276,7 @@ def get_extra_libs(hs, posix, cc_info, dynamic = False, pic = None, fixup_dir = 
 
     static_libs = depset(direct = static_libs)
     dynamic_libs = depset(direct = dynamic_libs)
-    return (static_libs, dynamic_libs, extra_flags)
+    return (static_libs, dynamic_libs)
 
 def create_link_config(hs, posix, cc_info, binary, args, dynamic = None, pic = None):
     """Configure linker flags and inputs.
@@ -304,7 +301,7 @@ def create_link_config(hs, posix, cc_info, binary, args, dynamic = None, pic = N
         dynamic_libs: depset of File, dynamic library files.
     """
 
-    (static_libs, dynamic_libs, _) = get_extra_libs(
+    (static_libs, dynamic_libs) = get_extra_libs(
         hs,
         posix,
         cc_info,
