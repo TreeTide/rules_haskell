@@ -76,7 +76,7 @@ def build_haskell_repl(
         cc_info,
         path_prefix = "$RULES_HASKELL_EXEC_ROOT",
     )
-    link_libraries(ghci_extra_libs, args)
+    link_libraries(hs.label, ghci_extra_libs, args)
 
     # NOTE: We can avoid constructing this in the future by instead generating
     #   a dedicated package configuration file defining the required libraries.

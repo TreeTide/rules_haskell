@@ -123,7 +123,7 @@ def _haskell_doctest_single(target, ctx):
 
     # C library dependencies to link against.
     ghci_extra_libs = get_ghci_extra_libs(hs, posix, cc_info)
-    link_libraries(ghci_extra_libs, args, prefix_optl = hs.toolchain.is_darwin)
+    link_libraries(ctx.label, ghci_extra_libs, args, prefix_optl = hs.toolchain.is_darwin)
 
     if ctx.attr.modules:
         inputs = ctx.attr.modules

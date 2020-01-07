@@ -223,10 +223,11 @@ def get_static_hs_lib_name(with_profiling, lib):
         name = "ffi"
     return name
 
-def link_libraries(libs, args, prefix_optl = False):
+def link_libraries(label, libs, args, prefix_optl = False):
     """Add linker flags to link against the given libraries.
 
     Args:
+      label: Label of the current rule.
       libs: Sequence of File, libraries to link.
       args: Args or List, append arguments to this object.
       prefix_optl: Bool, whether to prefix linker flags by -optl
@@ -258,15 +259,24 @@ def link_libraries(libs, args, prefix_optl = False):
     # depending on C libraries to fail.
     rpathfmt = "-optl-Wl,-rpath,%s"
 
+    extra_dirs_fmt = "-optl-B%s"
+    extra_dirs = {
+        extra_dirs_fmt % lib.dirname: []
+        for lib in cc_libs.to_list()
+        if lib.owner == label
+    }.keys()
+
     if hasattr(args, "add_all"):
         args.add_all(cc_libs, map_each = get_lib_name, format_each = libfmt)
         args.add_all(cc_libs, map_each = get_dirname, format_each = dirfmt, uniquify = True)
         args.add_all(cc_libs, map_each = get_dirname, format_each = rpathfmt, uniquify = True)
+        args.add_all(extra_dirs)
     else:
         cc_libs_list = cc_libs.to_list()
         args.extend([libfmt % get_lib_name(lib) for lib in cc_libs_list])
         args.extend([dirfmt % lib.dirname for lib in cc_libs_list])
         args.extend([rpathfmt % lib.dirname for lib in cc_libs_list])
+        args.extend(extra_dirs)
 
 # tests in /tests/unit_tests/BUILD
 def parent_dir_path(path):

@@ -61,7 +61,7 @@ def build_haskell_runghc(
         cc_info,
         path_prefix = "$RULES_HASKELL_EXEC_ROOT",
     )
-    link_libraries(ghci_extra_libs, args)
+    link_libraries(hs.label, ghci_extra_libs, args)
 
     runghc_file = hs.actions.declare_file(target_unique_name(hs, "runghc"))
 

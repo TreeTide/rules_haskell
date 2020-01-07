@@ -239,7 +239,7 @@ def _create_repl(hs, posix, ctx, repl_info, output):
         cc_info,
         path_prefix = "$RULES_HASKELL_EXEC_ROOT",
     )
-    link_libraries(ghci_extra_libs, args)
+    link_libraries(hs.label, ghci_extra_libs, args)
 
     # Add import directories
     for import_dir in repl_info.load_info.import_dirs.to_list():
