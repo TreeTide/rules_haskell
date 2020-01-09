@@ -153,6 +153,32 @@ def get_dirname(file):
     """Return the path to the directory containing the file."""
     return file.dirname
 
+def split_lib_extension(lib):
+    """Separate the library name and the library extension.
+
+    The library name is the filename with the "lib" prefix stripped (if
+    present) and the extension removed.
+
+    The extension is the file extension excluding the leading ".", e.g.
+    "so.1.2.3", "pic.a".
+
+    Returns
+      (String, String): A tuple of library name and extension.
+    """
+    base = lib.basename[3:] if lib.basename[:3] == "lib" else lib.basename
+    so_ext = base.find(".so.")
+    if so_ext != -1:
+        libname = base[:so_ext]
+        ext = base[so_ext + 1:]
+    elif base.endswith(".pic.a"):
+        libname = base[:len(".pic.a")]
+        ext = "pic.a"
+    else:
+        (libname, ext) = paths.split_extension(base)
+        if ext.startswith("."):
+            ext = ext[1:]
+    return (libname, ext)
+
 def get_lib_name(lib):
     """Return name of library by dropping extension and "lib" prefix.
 
@@ -162,11 +188,8 @@ def get_lib_name(lib):
     Returns:
       String: name of library.
     """
-
-    base = lib.basename[3:] if lib.basename[:3] == "lib" else lib.basename
-    n = base.find(".so.")
-    end = paths.replace_extension(base, "") if n == -1 else base[:n]
-    return end
+    (libname, _) = split_lib_extension(lib)
+    return libname
 
 def get_lib_extension(lib):
     """Return extension of the library
@@ -179,9 +202,8 @@ def get_lib_extension(lib):
     Returns:
       String: extension of the library.
     """
-    n = lib.basename.find(".so.")
-    end = lib.extension if n == -1 else lib.basename[n + 1:]
-    return end
+    (_, ext) = split_lib_extension(lib)
+    return ext
 
 def is_hs_library(libname):
     """Returns True if the library belongs into the hs-libraries field."""
