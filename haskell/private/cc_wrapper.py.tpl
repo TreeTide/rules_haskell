@@ -730,6 +730,9 @@ def get_lib_name(filename):
     if dotsodot != -1:
         return libname[:dotsodot]
 
+    if libname.endswith(".pic.a"):
+        return libname[:len(".pic.a")]
+
     libname, ext = os.path.splitext(libname)
     if ext in [".dll", ".dylib", ".so"]:
         return libname
@@ -824,6 +827,12 @@ def print_file_name(filename, args):
 
         # Retry with .so extension.
         found = run_cc_print_file_name("%s.so" % basename, args)
+    elif not found and ext == ".a":
+        # Bazel can generate static libraries with .pic.a extension.
+        # However, GHC only looks for files with .a extension.
+
+        # Retry with .pic.a extension.
+        found = run_cc_print_file_name("%s.pic.a" % basename, args)
 
     # Note, gcc --print-file-name does not fail if the file was not found, but
     # instead just returns the input filename.
